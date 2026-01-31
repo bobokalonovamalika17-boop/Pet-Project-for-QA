@@ -1,0 +1,880 @@
+{
+  "info": {
+    "_postman_id": "874d7dd8-dbf3-46cf-9c13-a5928386a3ef",
+    "name": "API Testing Pet Project",
+    "description": "Коллекция автотестов для демонстрации навыков API тестирования.  \nВключает тесты для JSONPlaceholder, OpenWeatherMap и ReqRes API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51606006",
+    "_collection_link": "https://go.postman.co/collection/51606006-874d7dd8-dbf3-46cf-9c13-a5928386a3ef?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "JSONPlaceholder (CRUD)",
+      "item": [
+        {
+          "name": "List all posts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка времени ответа\r",
+                  "pm.test(\"Response time is less than 500ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                  "});\r",
+                  "//проверка типа контента\r",
+                  "pm.test(\"Content-Type is JSON\", function () {\r",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+                  "});\r",
+                  "// проверка что ответ это массив\r",
+                  "pm.test(\"Response is an array\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.be.an(\"array\");\r",
+                  "});\r",
+                  "//проверка структуры первого элемента\r",
+                  "pm.test(\"First element has correct structure\", function () {\r",
+                  "const jsonData = pm.response.json ();\r",
+                  "    const firstPost = jsonData[0];\r",
+                  "\r",
+                  "    pm.expect(firstPost).to.have.property('userId');\r",
+                  "    pm.expect(firstPost).to.have.property('id');\r",
+                  "    pm.expect(firstPost).to.have.property('title');\r",
+                  "    pm.expect(firstPost).to.have.property('body');\r",
+                  "\r",
+                  "    pm.expect(firstPost.userId).to.be.a('number');\r",
+                  "    pm.expect(firstPost.id).to.be.a('number');\r",
+                  "    pm.expect(firstPost.title).to.be.a('string');\r",
+                  "    pm.expect(firstPost.body).to.be.a('string');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url_jsonplaceholder}}/posts",
+              "host": [
+                "{{base_url_jsonplaceholder}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Single post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка ID полученного поста\r",
+                  "pm.test(\"Post ID is 1\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.id).to.eql(1);\r",
+                  "});\r",
+                  "//проверка обязательных полей поста\r",
+                  "pm.test(\"Post has all required fields\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.all.keys('userId','id','title','body');\r",
+                  "});\r",
+                  "//проверка того что поле не пустое\r",
+                  "pm.test(\"Post title is not empty\", function () {\r",
+                  "    const jsonData = pm.response.json ();\r",
+                  "    pm.expect(jsonData.title).to.not.be.empty;\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url_jsonplaceholder}}/posts/1",
+              "host": [
+                "{{base_url_jsonplaceholder}}"
+              ],
+              "path": [
+                "posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create new post",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "//Генерация случайного заголовка\r",
+                  "const randomTitle = \"Test Post\" + Math.floor(Math.random() * 10000);\r",
+                  "pm.variables.set(\"random_title\",randomTitle);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "//проверка на существование поля\r",
+                  "pm.test(\"Response has id property\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('id');\r",
+                  "});\r",
+                  "//Проверка соответствия запроса и ответа\r",
+                  "pm.test(\"Created post has correct data\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.title).to.include(\"Test Post\");\r",
+                  "});\r",
+                  "// Сохранение ID созданного поста в переменную окружения\r",
+                  "pm.test(\"Save created post ID\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.environment.set(\"created_post_id\", jsonData.id);\r",
+                  "    console.log(\"Created post ID: \" + jsonData.id);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"{{random_title}}\",\r\n    \"body\": \"This is a test post created for API testing demo\",\r\n    \"userId\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url_jsonplaceholder}}/posts",
+              "host": [
+                "{{base_url_jsonplaceholder}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка обновления \r",
+                  "pm.test(\"Post was updated\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.title).to.eql(\"Updated Post Title\");\r",
+                  "    pm.expect(jsonData.body).to.eql(\"This post has been updated completely\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": 101,\r\n    \"title\": \"Updated Post Title\",\r\n    \"body\": \"This post has been updated completely\",\r\n    \"userId\": 1\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url_jsonplaceholder}}/posts/1",
+              "host": [
+                "{{base_url_jsonplaceholder}}"
+              ],
+              "path": [
+                "posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Partial update",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка того что только title поменлся\r",
+                  "pm.test(\"Only title was updated\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.title).to.eql(\"Partially Updated Title\");\r",
+                  "    pm.expect(jsonData).to.have.property('body');\r",
+                  "    pm.expect(jsonData).to.have.property('userId');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Partially Updated Title\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url_jsonplaceholder}}/posts/1",
+              "host": [
+                "{{base_url_jsonplaceholder}}"
+              ],
+              "path": [
+                "posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка пустого ответа\r",
+                  "pm.test(\"Response is empty object\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(Object.keys(jsonData).length).to.eql(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url_jsonplaceholder}}/posts/1",
+              "host": [
+                "{{base_url_jsonplaceholder}}"
+              ],
+              "path": [
+                "posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "OpenWeatherMap (Query Params)",
+      "item": [
+        {
+          "name": "Current weather by city",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка ответа что она имеет данные о погоде\r",
+                  "pm.test(\"Response contains weather data\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('weather');\r",
+                  "    pm.expect(jsonData).to.have.property('main');\r",
+                  "    pm.expect(jsonData).to.have.property('name');\r",
+                  "});\r",
+                  "//проверка того что температура это цифры\r",
+                  "pm.test(\"Temperature is a number\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.main.temp).to.be.a('number');\r",
+                  "});\r",
+                  "//проверка имени города\r",
+                  "pm.test(\"City name is correct\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.name).to.eql(\"London\");\r",
+                  "});\r",
+                  "//проверка что массив не пустой\r",
+                  "pm.test(\"Weather array is not empty\", function () {\r",
+                  "     const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.weather).to.be.an('array').that.is.not.empty;\r",
+                  "});\r",
+                  "// Логирование температуры\r",
+                  "pm.test(\"Log temperature\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    console.log(\"Current temperature in London: \" + jsonData.main.temp + \"°C\");\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url_weather}}/weather?q=London&appid={{weather_api_key}}&units=metric",
+              "host": [
+                "{{base_url_weather}}"
+              ],
+              "path": [
+                "weather"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "London"
+                },
+                {
+                  "key": "appid",
+                  "value": "{{weather_api_key}}"
+                },
+                {
+                  "key": "units",
+                  "value": "metric"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Weather by coordinates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка координат\r",
+                  "pm.test(\"Coordinates are correct\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.coord.lat).to.be.closeTo(51.5074, 0.1);\r",
+                  "    pm.expect(jsonData.coord.lon).to.be.closeTo(-0.1278, 0.1);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url_weather}}/weather?lat=51.5074&lon=-0.1278&appid={{weather_api_key}}&units=metric",
+              "host": [
+                "{{base_url_weather}}"
+              ],
+              "path": [
+                "weather"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "51.5074"
+                },
+                {
+                  "key": "lon",
+                  "value": "-0.1278"
+                },
+                {
+                  "key": "appid",
+                  "value": "{{weather_api_key}}"
+                },
+                {
+                  "key": "units",
+                  "value": "metric"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ReqRes (Status Codes)",
+      "item": [
+        {
+          "name": "List users (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка что ответ содержит данные для пагинации\\\r",
+                  "pm.test(\"Response has pagination\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('page');\r",
+                  "    pm.expect(jsonData).to.have.property('per_page');\r",
+                  "    pm.expect(jsonData).to.have.property('total');\r",
+                  "    pm.expect(jsonData).to.have.property('data');\r",
+                  "});\r",
+                  "//проверка что массив содержит users\r",
+                  "pm.test(\"Data array contains users\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.data).to.be.an('array').that.is.not.empty;\r",
+                  "    pm.expect(jsonData.data[0]).to.have.property('email');\r",
+                  "    pm.expect(jsonData.data[0]).to.have.property('first_name');\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{x-api-key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_reqres}}/users?page=1",
+              "host": [
+                "{{base_url_reqres}}"
+              ],
+              "path": [
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register successful (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода ответа\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка что ответ содержит token и id\r",
+                  "pm.test(\"Response contains token and id\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('id');\r",
+                  "    pm.expect(jsonData).to.have.property('token');\r",
+                  "    pm.expect(jsonData.token).to.be.a('string').that.is.not.empty;\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{x-api-key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"eve.holt@reqres.in\",\r\n    \"password\": \"pistol\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url_reqres}}/register",
+              "host": [
+                "{{base_url_reqres}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login successful (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода ответа\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "//проверка возвращения токена\r",
+                  "pm.test(\"Token is returned\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('token');\r",
+                  "    pm.expect(jsonData.token).to.be.a('string');\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{x-api-key}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"eve.holt@reqres.in\",\r\n    \"password\": \"cityslicka\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url_reqres}}/login",
+              "host": [
+                "{{base_url_reqres}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "User not found (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода 404\r",
+                  "pm.test(\"Status code is 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "//проверка что ответ пустой\r",
+                  "pm.test(\"Response body is empty object\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(Object.keys(jsonData).length).to.eql(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "{{x-api-key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_reqres}}/users/999999",
+              "host": [
+                "{{base_url_reqres}}"
+              ],
+              "path": [
+                "users",
+                "999999"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Negative Tests",
+      "item": [
+        {
+          "name": "Create post without body (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 400\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "//проверка что в ответе есть сообщение об ошибке\r",
+                  "pm.test(\"Error message is present\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('error');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "reqres_99ae26e9e6bc4eba9adb962938a8abfe",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"test@test.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url_reqres}}/register",
+              "host": [
+                "{{base_url_reqres}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid endpoint (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "reqres_99ae26e9e6bc4eba9adb962938a8abfe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_jsonplaceholder}}/invalid-endpoint",
+              "host": [
+                "{{base_url_jsonplaceholder}}"
+              ],
+              "path": [
+                "invalid-endpoint"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Weather with invalid key (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "//проверка статус кода\r",
+                  "pm.test(\"Status code is 401\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "//проверка что ответ выдает невалидный апи ключ\r",
+                  "pm.test(\"Error message mentions API key\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.message).to.include(\"Invalid API key\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-api-key",
+                "value": "reqres_99ae26e9e6bc4eba9adb962938a8abfe",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url_weather}}/weather?q=London&appid=INVALID_KEY",
+              "host": [
+                "{{base_url_weather}}"
+              ],
+              "path": [
+                "weather"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "London"
+                },
+                {
+                  "key": "appid",
+                  "value": "INVALID_KEY"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
